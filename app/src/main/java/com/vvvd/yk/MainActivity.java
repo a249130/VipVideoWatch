@@ -55,10 +55,11 @@ public class MainActivity extends Activity {
     private ImageButton mHome;
     private ImageButton mMore;
     private Button mGo;
+    private Button Vip;
     private EditText mUrl;
 
     private static final String mHomeUrl = "http://app.html5.qq.com/navi/index";
-    private static final String TAG = "SdkDemo";
+    private static final String TAG = "MainActivity";
     private static final int MAX_LENGTH = 14;
     private boolean mNeedTestPage = false;
 
@@ -88,15 +89,15 @@ public class MainActivity extends Activity {
             }
         }
         //
-        try {
-            if (Integer.parseInt(android.os.Build.VERSION.SDK) >= 11) {
-                getWindow()
-                        .setFlags(
-                                android.view.WindowManager.LayoutParams.FLAG_HARDWARE_ACCELERATED,
-                                android.view.WindowManager.LayoutParams.FLAG_HARDWARE_ACCELERATED);
-            }
-        } catch (Exception e) {
-        }
+//        try {
+//            if (Integer.parseInt(android.os.Build.VERSION.SDK) >= 11) {
+//                getWindow()
+//                        .setFlags(
+//                                android.view.WindowManager.LayoutParams.FLAG_HARDWARE_ACCELERATED,
+//                                android.view.WindowManager.LayoutParams.FLAG_HARDWARE_ACCELERATED);
+//            }
+//        } catch (Exception e) {
+//        }
 
 		/*
 		 * getWindow().addFlags(
@@ -139,9 +140,28 @@ public class MainActivity extends Activity {
                 .getDrawable(R.drawable.color_progressbar));
     }
 
+    //开启X5全屏模式
+    private void OpenX5FullScreen(){
+        if (mWebView.getX5WebViewExtension() != null) {
+//            Toast.makeText(this, "开启X5全屏播放模式", Toast.LENGTH_LONG).show();
+            Bundle data = new Bundle();
+
+            data.putBoolean("standardFullScreen", false);// true表示标准全屏，false表示X5全屏；不设置默认false，
+
+            data.putBoolean("supportLiteWnd", false);// false：关闭小窗；true：开启小窗；不设置默认true，
+
+            data.putInt("DefaultVideoScreen", 2);// 1：以页面内开始播放，2：以全屏开始播放；不设置默认：1
+
+            mWebView.getX5WebViewExtension().invokeMiscMethod("setVideoParams",
+                    data);
+        }
+    }
+
     private void init() {
 
         mWebView = new X5WebView(this, null);
+
+        OpenX5FullScreen();
 
         mViewParent.addView(mWebView, new FrameLayout.LayoutParams(
                 FrameLayout.LayoutParams.FILL_PARENT,
@@ -305,6 +325,7 @@ public class MainActivity extends Activity {
         mExit = (ImageButton) findViewById(R.id.btnExit1);
         mHome = (ImageButton) findViewById(R.id.btnHome1);
         mGo = (Button) findViewById(R.id.btnGo1);
+        Vip = (Button) findViewById(R.id.vip);
         mUrl = (EditText) findViewById(R.id.editUrl1);
         mMore = (ImageButton) findViewById(R.id.btnMore);
         if (Integer.parseInt(android.os.Build.VERSION.SDK) >= 16) {
@@ -339,6 +360,18 @@ public class MainActivity extends Activity {
                 String url = mUrl.getText().toString();
                 mWebView.loadUrl(url);
                 mWebView.requestFocus();
+            }
+        });
+        Vip.setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                X5WebView.UA = "winds";
+                mWebView.loadUrl("http://y.mt2t.com/lines?url="+mWebView.getUrl());
+                mWebView.requestFocus();
+//                Intent intent = new Intent();
+//                intent.putExtra("url","http://y.mt2t.com/lines?url="+mWebView.getUrl());
+//                intent.setClass(MainActivity.this,WatchActivity.class);
+//                startActivity(intent);
             }
         });
 
@@ -441,6 +474,7 @@ public class MainActivity extends Activity {
     @Override
     public boolean onKeyDown(int keyCode, KeyEvent event) {
 
+        X5WebView.UA = "Android";
         if (keyCode == KeyEvent.KEYCODE_BACK) {
             if (mWebView != null && mWebView.canGoBack()) {
                 mWebView.goBack();

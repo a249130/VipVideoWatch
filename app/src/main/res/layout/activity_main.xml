@@ -40,6 +40,18 @@
             android:textSize="35px"
             android:visibility="gone" />
 
+        <Button
+            android:id="@+id/vip"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Vip"
+            android:layout_marginLeft="1dp"
+            android:layout_marginRight="10dp"
+            android:layout_marginTop="3dp"
+            android:background="#ECF0F2"
+            android:linksClickable="false"
+            android:textSize="35px"/>
+
     </LinearLayout>
 
     <ProgressBar
