@@ -11,6 +11,7 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.os.Process;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.KeyEvent;
@@ -72,6 +73,8 @@ public class MainActivity extends Activity {
 
     private URL mIntentUrl;
 
+    private SwipeRefreshLayout swipeRefreshLayout;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -89,15 +92,15 @@ public class MainActivity extends Activity {
             }
         }
         //
-//        try {
-//            if (Integer.parseInt(android.os.Build.VERSION.SDK) >= 11) {
-//                getWindow()
-//                        .setFlags(
-//                                android.view.WindowManager.LayoutParams.FLAG_HARDWARE_ACCELERATED,
-//                                android.view.WindowManager.LayoutParams.FLAG_HARDWARE_ACCELERATED);
-//            }
-//        } catch (Exception e) {
-//        }
+        try {
+            if (Integer.parseInt(android.os.Build.VERSION.SDK) >= 11) {
+                getWindow()
+                        .setFlags(
+                                android.view.WindowManager.LayoutParams.FLAG_HARDWARE_ACCELERATED,
+                                android.view.WindowManager.LayoutParams.FLAG_HARDWARE_ACCELERATED);
+            }
+        } catch (Exception e) {
+        }
 
 		/*
 		 * getWindow().addFlags(
@@ -110,6 +113,15 @@ public class MainActivity extends Activity {
 
         mTestHandler.sendEmptyMessageDelayed(MSG_INIT_UI, 10);
 
+        swipeRefreshLayout = findViewById(R.id.swip_refresh);
+        swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+            @Override
+            public void onRefresh() {
+                mWebView.loadUrl(mWebView.getUrl());
+                mWebView.requestFocus();
+                swipeRefreshLayout.setRefreshing(false);
+            }
+        });
     }
 
     private void changGoForwardButton(WebView view) {
@@ -365,8 +377,7 @@ public class MainActivity extends Activity {
         Vip.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View view) {
-                X5WebView.UA = "winds";
-                mWebView.loadUrl("http://y.mt2t.com/lines?url="+mWebView.getUrl());
+                mWebView.loadUrl("http://www.82190555.com/index/iqiyi.php?url="+mWebView.getUrl());
                 mWebView.requestFocus();
 //                Intent intent = new Intent();
 //                intent.putExtra("url","http://y.mt2t.com/lines?url="+mWebView.getUrl());
@@ -473,7 +484,6 @@ public class MainActivity extends Activity {
 
     @Override
     public boolean onKeyDown(int keyCode, KeyEvent event) {
-
         X5WebView.UA = "Android";
         if (keyCode == KeyEvent.KEYCODE_BACK) {
             if (mWebView != null && mWebView.canGoBack()) {
@@ -481,8 +491,27 @@ public class MainActivity extends Activity {
                 if (Integer.parseInt(android.os.Build.VERSION.SDK) >= 16)
                     changGoForwardButton(mWebView);
                 return true;
-            } else
-                return super.onKeyDown(keyCode, event);
+            } else{
+                boolean isOut = false;
+                AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
+                builder.setTitle("提示框");
+                builder.setMessage("是否要退出？");
+                builder.setPositiveButton("是", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+                        finish();
+                    }
+                });
+                builder.setNegativeButton("否", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+
+                    }
+                });
+                builder.create().show();
+
+            }
+
         }
         return super.onKeyDown(keyCode, event);
     }
