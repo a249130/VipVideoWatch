@@ -15,15 +15,18 @@ import android.support.v4.widget.SwipeRefreshLayout;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.KeyEvent;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.View.OnFocusChangeListener;
 import android.view.ViewGroup;
 import android.view.inputmethod.InputMethodManager;
+import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.FrameLayout;
 import android.widget.ImageButton;
+import android.widget.ListView;
 import android.widget.ProgressBar;
 import android.widget.Toast;
 
@@ -41,10 +44,13 @@ import com.tencent.smtt.utils.TbsLog;
 
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.ArrayList;
+import java.util.List;
 
 import utils.X5WebView;
 
 public class MainActivity extends Activity {
+    private SlidingMenu mMenu;
     /**
      * 作为一个浏览器的示例展示出来，采用android+web的模式
      */
@@ -56,10 +62,13 @@ public class MainActivity extends Activity {
     private ImageButton mHome;
     private ImageButton mMore;
     private Button mGo;
-    private Button Vip;
+    private Button menu;
     private EditText mUrl;
 
-    private static final String mHomeUrl = "http://app.html5.qq.com/navi/index";
+    private ListView listView;
+
+//    private static final String mHomeUrl = "http://app.html5.qq.com/navi/index";
+    private static final String mHomeUrl = "http://www.baidu.com";
     private static final String TAG = "MainActivity";
     private static final int MAX_LENGTH = 14;
     private boolean mNeedTestPage = false;
@@ -122,6 +131,51 @@ public class MainActivity extends Activity {
                 swipeRefreshLayout.setRefreshing(false);
             }
         });
+        mMenu = (SlidingMenu) findViewById(R.id.id_menu);
+        mMenu.setOnTouchListener(new View.OnTouchListener(){
+            @Override
+            public boolean onTouch(View arg0, MotionEvent arg1) {
+                return true;
+            }
+        });
+        List<String> list = new ArrayList<>();
+        list.add(R.mipmap.logo+"-VIP视频观看");
+        list.add(R.mipmap.shoucang+"-收藏");
+        list.add(R.mipmap.aiqiyi+"-爱奇艺");
+        list.add(R.mipmap.tengxun+"-腾讯视频");
+        list.add(R.mipmap.youku+"-优酷视频");
+        list.add(R.mipmap.shuoming+"-使用说明");
+        listView = findViewById(R.id.listview);
+        listView.setAdapter(new MyAdapter(MainActivity.this,list));
+        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+                mMenu.toggle();
+                switch (i){
+                    case 0: //VIP视频观看
+                        mWebView.loadUrl("http://www.82190555.com/index/iqiyi.php?url="+mWebView.getUrl());
+                        mWebView.requestFocus();
+                        break;
+                    case 1: //收藏
+
+                        break;
+                    case 2: //爱奇艺
+                        mWebView.loadUrl("https://www.iqiyi.com");
+                        mWebView.requestFocus();
+                        break;
+                    case 3: //腾讯视频
+                        mWebView.loadUrl("https://v.qq.com");
+                        mWebView.requestFocus();
+                        break;
+                    case 4: //优酷视频
+                        mWebView.loadUrl("http://www.youku.com");
+                        mWebView.requestFocus();
+                        break;
+                    case 5: //使用说明
+                        break;
+                }
+            }
+        });
     }
 
     private void changGoForwardButton(WebView view) {
@@ -147,9 +201,10 @@ public class MainActivity extends Activity {
         // ProgressBar(getApplicationContext(),
         // null,
         // android.R.attr.progressBarStyleHorizontal);
-        mPageLoadingProgressBar.setMax(100);
-        mPageLoadingProgressBar.setProgressDrawable(this.getResources()
-                .getDrawable(R.drawable.color_progressbar));
+
+//        mPageLoadingProgressBar.setMax(100);
+//        mPageLoadingProgressBar.setProgressDrawable(this.getResources()
+//                .getDrawable(R.drawable.color_progressbar));
     }
 
     //开启X5全屏模式
@@ -248,6 +303,18 @@ public class MainActivity extends Activity {
                  */
                 return super.onJsAlert(null, arg1, arg2, arg3);
             }
+            @Override
+            public void onProgressChanged(WebView view, int newProgress) {
+                if (newProgress == 100) {
+                    // 网页加载完成
+                    mPageLoadingProgressBar.setVisibility(View.GONE);
+                } else {
+                    // 加载中
+                    mPageLoadingProgressBar.setVisibility(View.VISIBLE);
+                    mPageLoadingProgressBar.setProgress(newProgress);
+                }
+                super.onProgressChanged(view, newProgress);
+            }
         });
 
         mWebView.setDownloadListener(new DownloadListener() {
@@ -337,7 +404,7 @@ public class MainActivity extends Activity {
         mExit = (ImageButton) findViewById(R.id.btnExit1);
         mHome = (ImageButton) findViewById(R.id.btnHome1);
         mGo = (Button) findViewById(R.id.btnGo1);
-        Vip = (Button) findViewById(R.id.vip);
+        menu = (Button) findViewById(R.id.menu);
         mUrl = (EditText) findViewById(R.id.editUrl1);
         mMore = (ImageButton) findViewById(R.id.btnMore);
         if (Integer.parseInt(android.os.Build.VERSION.SDK) >= 16) {
@@ -374,11 +441,10 @@ public class MainActivity extends Activity {
                 mWebView.requestFocus();
             }
         });
-        Vip.setOnClickListener(new OnClickListener() {
+        menu.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View view) {
-                mWebView.loadUrl("http://www.82190555.com/index/iqiyi.php?url="+mWebView.getUrl());
-                mWebView.requestFocus();
+                mMenu.toggle();
 //                Intent intent = new Intent();
 //                intent.putExtra("url","http://y.mt2t.com/lines?url="+mWebView.getUrl());
 //                intent.setClass(MainActivity.this,WatchActivity.class);
